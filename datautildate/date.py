@@ -108,7 +108,7 @@ class FlexiDate(object):
     our_re = re.compile(our_re_pat, re.VERBOSE)
     @classmethod
     def from_str(self, instr):
-        '''Undo affect of __str__'''
+        '''Undo effect of __str__'''
         if not instr:
             return FlexiDate()
 
@@ -184,6 +184,14 @@ def parse(date, dayfirst=True):
         val = 'UNPARSED: %s' % date
         val = val.encode('ascii', 'ignore')
         return FlexiDate(qualifier=val)
+        
+def parse_and_validate(date, dayfirst=True):
+    date = parse(date, dayfirst)
+    try:
+        date.as_datetime()
+        return date
+    except ValueError:
+        return None
 
 
 class DateParserBase(object):
@@ -232,18 +240,24 @@ class DateutilDateParser(DateParserBase):
         date = date.replace('BC', '')
 
         # deal with circa: 'c.1950' or 'c1950' or 'circa 1950'
-        circa_match = re.match('([^a-zA-Z]*)(circa|c)\.?\s*(\d+\??)', date)
+        circa_match = re.match('([^a-zA-Z]*)(circa|c)\.?\s*(\d+.*)', date)
         if circa_match:
             # remove circa bit
             qualifiers.append("Note 'circa'")
             date = ''.join(circa_match.group(1,3))
 
         # Deal with uncertainty: '1985?'
-        uncertainty_match = re.match('([0-9xX]{4})\?', date)
+        uncertainty_match = re.match('([0-9xX]{4})\?', date) #WTF is xX?
         if uncertainty_match:
             # remove the ?
             date = date[:-1]
             qualifiers.append('Uncertainty')
+            
+        # Deal with hyphenated years: '1980-2'
+        hyphenation_match = re.match('([^a-zA-Z]*)(\d{4})-\d*', date)
+        if hyphenation_match:
+            qualifiers.append("Note 'hyphenated year'")
+            date = ''.join(hyphenation_match.groups())
 
         # Parse the numbers intelligently
         # do not use std parser function as creates lots of default data

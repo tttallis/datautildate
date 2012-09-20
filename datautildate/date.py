@@ -227,12 +227,12 @@ class DateutilDateParser(DateParserBase):
         # BC seems to mess up parser
         date = date.replace('BC', '')
 
-        # deal with circa: 'c.1950' or 'c1950'
-        circa_match = re.match('([^a-zA-Z]*)c\.?\s*(\d+.*)', date)
+        # deal with circa: 'c.1950' or 'c1950' or 'circa 1950'
+        circa_match = re.match('([^a-zA-Z]*)(circa|c)\.?\s*(\d+.*)', date)
         if circa_match:
             # remove circa bit
             qualifiers.append("Note 'circa'")
-            date = ''.join(circa_match.groups())
+            date = ''.join(circa_match.group(1,3))
 
         # deal with p1980 (what does this mean? it can appear in
         # field 008 of MARC records

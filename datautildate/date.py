@@ -224,7 +224,7 @@ class DateutilDateParser(DateParserBase):
         date = date.replace('A.D.', 'AD')
 
         # deal with pre 0AD dates
-        if date.startswith('-') or 'BC' in date or 'B.C.' in date:
+        if date.startswith('-') or 'BC' in date:
             pre0AD = True
         else:
             pre0AD = False

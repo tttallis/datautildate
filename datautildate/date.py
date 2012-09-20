@@ -216,6 +216,10 @@ class DateutilDateParser(DateParserBase):
 
         # various normalizations
         # TODO: call .lower() first
+        date = date.replace('B.C.E.', 'BC')
+        date = date.replace('BCE.', 'BC')
+        date = date.replace('C.E.', 'AD')
+        date = date.replace('CE.', 'AD')
         date = date.replace('B.C.', 'BC')
         date = date.replace('A.D.', 'AD')
 

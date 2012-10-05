@@ -33,6 +33,7 @@ http://www.rufuspollock.org/2009/06/18/flexible-dates-in-python/
 '''
 import re
 import datetime
+import calendar
 
 class FlexiDate(object):
     """Store dates as strings and present them in a slightly extended version
@@ -133,11 +134,16 @@ class FlexiDate(object):
         '''
         if not self.year: return None
         out = float(self.year.replace('?', '9'))
+        leap = calendar.isleap(int(self.year))
+        
         if self.month:
             # TODO: we are assuming months are of equal length
             out += float(self.month.replace('?', '0')) / 12.0
             if self.day:
-                out += float(self.day.replace('?', '0')) / 365.0
+                if leap:
+                    out += float(self.day.replace('?', '0')) / 366.0
+                else:
+                    out += float(self.day.replace('?', '0')) / 365.0
         return out
 
     def as_datetime(self):
